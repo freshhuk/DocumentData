@@ -1,4 +1,4 @@
-package com.document.documentdata.documentdata;
+package com.document.documentdata;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
