@@ -20,6 +20,10 @@ public class Document {
     @Id
     @Column(name = "id")
     private int id;
+
+    @Column(name = "name")
+    private String name;
+
     @Column(name = "docType")
     private String docType;
 
