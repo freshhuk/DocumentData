@@ -2,14 +2,28 @@ package com.document.documentdata.Services;
 
 import com.document.documentdata.Models.Entities.Document;
 import com.document.documentdata.Repositories.DocumentRepository;
-import lombok.AllArgsConstructor;
+import org.springframework.amqp.rabbit.annotation.RabbitListener;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
-@AllArgsConstructor
 public class DataService {
+
     private final DocumentRepository repository;
     private final static String STATUS_CODE_200 = "200";
+
+    @Autowired
+    public DataService(DocumentRepository repository){
+        this.repository = repository;
+    }
+
+    //Test
+    @RabbitListener(queues = "FirstQueue")
+    public void receiver(String message){
+        System.out.println("Hello from receiver " + message);
+    }
+
+
     /**
      * Method save document in db
      * @param doc - document model
