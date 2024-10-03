@@ -16,6 +16,6 @@
 
 
         <!-- Mapping clases -->
-        <mapping class="com.document.documentdata.Models.Entities.Document"/>
+        <mapping class="com.document.documentdata.Domain.Entities.Document"/>
     </session-factory>
 </hibernate-configuration>

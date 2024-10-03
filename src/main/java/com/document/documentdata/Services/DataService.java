@@ -1,6 +1,7 @@
 package com.document.documentdata.Services;
 
-import com.document.documentdata.Models.Entities.Document;
+import com.document.documentdata.Domain.Entities.Document;
+import com.document.documentdata.Domain.Models.DocumentDTO;
 import com.document.documentdata.Repositories.DocumentRepository;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,6 +10,11 @@ import org.springframework.stereotype.Service;
 @Service
 public class DataService {
 
+
+    //TODO: кароче надо создать вторую очередь для обработки ошибок, и к примеру если что то случилось неудачное
+    //то отправлять ошибку в канал с ошибками, а в других микросервисах
+    // это читать и если мы поучаем ошибку то тогда отменять все наши действия
+    //Или не то что отменять просто использовать другую логику
     private final DocumentRepository repository;
     private final static String STATUS_CODE_200 = "200";
 
@@ -19,8 +25,8 @@ public class DataService {
 
     //Test
     @RabbitListener(queues = "FirstQueue")
-    public void receiver(String message){
-        System.out.println("Hello from receiver " + message);
+    public void receiveDocument(DocumentDTO documentDTO){
+        System.out.println("Success "+documentDTO.getFileName());
     }
 
 

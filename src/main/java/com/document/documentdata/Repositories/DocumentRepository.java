@@ -1,6 +1,6 @@
 package com.document.documentdata.Repositories;
 
-import com.document.documentdata.Models.Entities.Document;
+import com.document.documentdata.Domain.Entities.Document;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;

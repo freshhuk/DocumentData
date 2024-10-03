@@ -1,4 +1,4 @@
-package com.document.documentdata.Models.Entities;
+package com.document.documentdata.Domain.Entities;
 
 
 import jakarta.persistence.Column;
