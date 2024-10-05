@@ -15,15 +15,52 @@ public class DocumentRepository {
             .addAnnotatedClass(Document.class)
             .buildSessionFactory();
 
+
+    public Document getByName(String name){
+        try(Session session = factory.openSession()){
+
+            session.beginTransaction();
+
+            Query<Document> query = session.createQuery("from Document where name =:  name", Document.class);
+            query.setParameter("name", name);
+
+            Document document = query.uniqueResult();
+            session.getTransaction().commit();
+
+            return document;
+
+        } catch (Exception ex) {
+            System.out.println("Error with getByName in db: " + ex);
+            return null;
+        }
+    }
+
     public void add(Document doc){
         try(Session session = factory.openSession()){
             session.beginTransaction();
             session.persist(doc);
             session.getTransaction().commit();
         } catch (Exception ex) {
-            System.out.println("Error with add in db");
+            System.out.println("Error with add in db: " + ex);
         }
     }
+
+    public void update(Document doc){
+        try(Session session = factory.openSession()){
+            session.beginTransaction();
+
+            var document = session.get(Document.class, doc.getId());
+
+            document.setIdUserModify(doc.getIdUserModify());
+            document.setModifyDate(doc.getModifyDate());
+
+            session.merge(document); // we use marge for update own entity
+            session.getTransaction().commit();
+        }catch( Exception ex){
+            System.out.println("Error with update method: " + ex);
+        }
+    }
+
     public boolean docIsExist(String docName){
         try (Session session = factory.openSession()) {
             session.beginTransaction();

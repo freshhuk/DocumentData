@@ -1,14 +1,13 @@
 package com.document.documentdata.Domain.Entities;
 
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
+import java.time.LocalDate;
 
 @Entity
 @Table(name = "documents")
@@ -18,6 +17,7 @@ import lombok.NoArgsConstructor;
 @Builder
 public class Document {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     private int id;
 
@@ -28,10 +28,10 @@ public class Document {
     private String docType;
 
     @Column(name = "createdDate")
-    private String createdDate;
+    private LocalDate createdDate;
 
     @Column(name = "modifyDate")
-    private String modifyDate;
+    private LocalDate modifyDate;
 
     @Column(name = "idUserCreate")
     private int idUserCreate;
