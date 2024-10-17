@@ -33,7 +33,9 @@ public class MessageQueueHandler {
             String result = dataService.add(documentDTO);
             if(result.equals(STATUS_CODE_200)){
                 System.out.println("Success " + documentDTO.getFileName());
-                //TODO в случае успеха кинуть смс на монго сервак
+                //sendMessage("SecondQueue", "Done");
+                sendMessage("SecondQueue", documentDTO);
+
             }else{
                 System.out.println("Ops.. " + documentDTO.getFileName());
                 //кинуть смс о проблеме на апишку
@@ -45,4 +47,11 @@ public class MessageQueueHandler {
         }
 
     }
+    private void sendMessage(String nameQueue, String status){
+        rabbitTemplate.convertAndSend(nameQueue, status);
+    }
+    private void sendMessage(String nameQueue, DocumentDTO docDTO){
+        rabbitTemplate.convertAndSend(nameQueue, docDTO);
+    }
+
 }

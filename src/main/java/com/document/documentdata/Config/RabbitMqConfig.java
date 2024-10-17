@@ -1,6 +1,8 @@
 package com.document.documentdata.Config;
 
+import org.springframework.amqp.core.Queue;
 import org.springframework.amqp.rabbit.connection.CachingConnectionFactory;
+import org.springframework.amqp.rabbit.core.RabbitAdmin;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;
 import org.springframework.beans.factory.annotation.Value;
@@ -17,6 +19,11 @@ public class RabbitMqConfig {
     private String queuePassword;
 
     @Bean
+    public Queue queue(){
+        return new Queue("SecondQueue", false); //TODO
+    }
+
+    @Bean
     public CachingConnectionFactory connectionFactory(){
         CachingConnectionFactory connection = new CachingConnectionFactory("localhost");
         connection.setUsername(queueUserName);
@@ -29,7 +36,10 @@ public class RabbitMqConfig {
         template.setMessageConverter(jackson2JsonMessageConverter());
         return template;
     }
-
+    @Bean
+    public RabbitAdmin rabbitAdmin(){
+        return  new RabbitAdmin(connectionFactory());
+    }
     @Bean
     public Jackson2JsonMessageConverter jackson2JsonMessageConverter() {
         return new Jackson2JsonMessageConverter();

@@ -3,7 +3,6 @@ package com.document.documentdata.Services;
 import com.document.documentdata.Domain.Entities.Document;
 import com.document.documentdata.Domain.Models.DocumentDTO;
 import com.document.documentdata.Repositories.DocumentRepository;
-import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -32,7 +31,7 @@ public class DataService {
      */
     public String add(DocumentDTO doc) {
         try {
-            if (isExist(doc)) {
+            if (!isExist(doc)) {
 
                 LocalDate currentDate = LocalDate.now();
 
