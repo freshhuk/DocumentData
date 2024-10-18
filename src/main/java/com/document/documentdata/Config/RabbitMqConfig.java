@@ -20,7 +20,7 @@ public class RabbitMqConfig {
 
     @Bean
     public Queue queue(){
-        return new Queue("SecondQueue", false); //TODO
+        return new Queue("MongoQueue", false);
     }
 
     @Bean

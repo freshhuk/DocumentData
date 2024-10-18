@@ -27,14 +27,14 @@ public class MessageQueueHandler {
      *
      * @param documentDTO - document model
      */
-    @RabbitListener(queues = "FirstQueue")
+    @RabbitListener(queues = "dataQueue")
     public void receiveDocument(DocumentDTO documentDTO) {
         try{
             String result = dataService.add(documentDTO);
             if(result.equals(STATUS_CODE_200)){
                 System.out.println("Success " + documentDTO.getFileName());
                 //sendMessage("SecondQueue", "Done");
-                sendMessage("SecondQueue", documentDTO);
+                sendMessage("MongoQueue", documentDTO);
 
             }else{
                 System.out.println("Ops.. " + documentDTO.getFileName());
