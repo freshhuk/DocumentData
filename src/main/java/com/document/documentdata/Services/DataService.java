@@ -11,10 +11,6 @@ import java.time.LocalDate;
 @Service
 public class DataService {
 
-    //TODO: кароче надо создать вторую очередь для обработки ошибок, и к примеру если что то случилось неудачное
-    //то отправлять ошибку в канал с ошибками, а в других микросервисах
-    // это читать и если мы поучаем ошибку то тогда отменять все наши действия
-    //Или не то что отменять просто использовать другую логику
     private final DocumentRepository repository;
     private final static String STATUS_CODE_200 = "200";
 
@@ -26,7 +22,6 @@ public class DataService {
 
     /**
      * Method save document in db
-     *
      * @param doc - document model
      */
     public String add(DocumentDTO doc) {
@@ -69,6 +64,34 @@ public class DataService {
         }
     }
 
+    /**
+     * Method for deleting document from postgres database
+     * @param status - document status
+     * @return - method status
+     */
+    public String deleteDocument(String status){
+        try{
+            String fileName = parseStatus(status);
+            var model = repository.getByName(fileName);
+            if(model!= null){
+                repository.deleteById(model.getId());
+                return "DeleteDone";
+            } else {
+                System.out.println("deleteDocument: Model is null");
+                return "ErrorDelete";
+            }
+        } catch (Exception ex){
+            return "ErrorDelete";
+        }
+    }
+
+    private String parseStatus(String status){
+        StringBuilder stringBuilder = new StringBuilder(status);
+        stringBuilder.delete(0, 3);
+        status = stringBuilder.toString();
+        return  status;
+
+    }
     private boolean isExist(DocumentDTO doc) {
         if (!repository.docIsExist(doc.getFileName())) {
             String lastFourCharacters = doc.getFileName().substring(doc.getFileName().length() - 5);

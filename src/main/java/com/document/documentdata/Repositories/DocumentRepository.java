@@ -35,6 +35,16 @@ public class DocumentRepository {
         }
     }
 
+    public void deleteById(int id){
+        try(Session session = factory.openSession()){
+            session.beginTransaction();
+
+            var model = session.get(Document.class, id);
+
+            session.remove(model);
+            session.getTransaction().commit();
+        }
+    }
     public void add(Document doc){
         try(Session session = factory.openSession()){
             session.beginTransaction();

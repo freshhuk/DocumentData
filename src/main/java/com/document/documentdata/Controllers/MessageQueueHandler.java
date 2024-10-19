@@ -12,6 +12,8 @@ public class MessageQueueHandler {
 
     private final DataService dataService;
     private final static String STATUS_CODE_200 = "200";
+    /* Constant for queue */
+    private final static String STATUS_ERROR_API = "ErrorFromData";
     private final RabbitTemplate rabbitTemplate;
 
 
@@ -33,20 +35,33 @@ public class MessageQueueHandler {
             String result = dataService.add(documentDTO);
             if(result.equals(STATUS_CODE_200)){
                 System.out.println("Success " + documentDTO.getFileName());
-                //sendMessage("SecondQueue", "Done");
+                sendMessage("StatusDataQueue", "Done");
                 sendMessage("MongoQueue", documentDTO);
 
             }else{
                 System.out.println("Ops.. " + documentDTO.getFileName());
-                //кинуть смс о проблеме на апишку
+                sendMessage("StatusDataQueue", STATUS_ERROR_API);
             }
 
         }catch (Exception ex){
             System.out.println("Error from receiveDocument : " + ex);
-            //кинуть смс о проблеме на апишку
+            sendMessage("StatusDataQueue", STATUS_ERROR_API);
         }
 
     }
+    @RabbitListener(queues = "StatusMongoQueue")
+    public void receiveMongoStatus(String status){
+        boolean statusL = status.length() == 3;
+
+        if(status.equals("Done")){
+            sendMessage("StatusDataQueue", "AllDone");
+        } else if (statusL) {
+            String result = dataService.deleteDocument(status);
+            System.out.println(result);
+            sendMessage("StatusDataQueue", "AllError");
+        }
+    }
+
     private void sendMessage(String nameQueue, String status){
         rabbitTemplate.convertAndSend(nameQueue, status);
     }
