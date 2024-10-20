@@ -1,5 +1,6 @@
 package com.document.documentdata.Controllers;
 
+import com.document.documentdata.Domain.Enums.QueueStatus;
 import com.document.documentdata.Domain.Models.DocumentDTO;
 import com.document.documentdata.Services.DataService;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
@@ -13,7 +14,6 @@ public class MessageQueueHandler {
     private final DataService dataService;
     private final static String STATUS_CODE_200 = "200";
     /* Constant for queue */
-    private final static String STATUS_ERROR_API = "ErrorFromData";
     private final RabbitTemplate rabbitTemplate;
 
 
@@ -35,17 +35,17 @@ public class MessageQueueHandler {
             String result = dataService.add(documentDTO);
             if(result.equals(STATUS_CODE_200)){
                 System.out.println("Success " + documentDTO.getFileName());
-                sendMessage("StatusDataQueue", "Done");
+                sendMessage("StatusDataQueue", QueueStatus.DONE.toString());
                 sendMessage("MongoQueue", documentDTO);
 
             }else{
                 System.out.println("Ops.. " + documentDTO.getFileName());
-                sendMessage("StatusDataQueue", STATUS_ERROR_API);
+                sendMessage("StatusDataQueue", QueueStatus.BAD.toString());
             }
 
         }catch (Exception ex){
             System.out.println("Error from receiveDocument : " + ex);
-            sendMessage("StatusDataQueue", STATUS_ERROR_API);
+            sendMessage("StatusDataQueue", QueueStatus.BAD.toString());
         }
 
     }
@@ -53,12 +53,16 @@ public class MessageQueueHandler {
     public void receiveMongoStatus(String status){
         boolean statusL = status.length() == 3;
 
-        if(status.equals("Done")){
+        if(status.equals(QueueStatus.DONE.toString())){
             sendMessage("StatusDataQueue", "AllDone");
-        } else if (statusL) {
+        } else if (!statusL) {
             String result = dataService.deleteDocument(status);
             System.out.println(result);
             sendMessage("StatusDataQueue", "AllError");
+        }
+        else{
+            sendMessage("StatusDataQueue", "AllError");
+            System.out.println(status);
         }
     }
 

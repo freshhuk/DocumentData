@@ -26,7 +26,7 @@ public class DataService {
      */
     public String add(DocumentDTO doc) {
         try {
-            if (!isExist(doc)) {
+            if (!repository.docIsExist(doc.getFileName())) {
 
                 LocalDate currentDate = LocalDate.now();
 
@@ -42,6 +42,7 @@ public class DataService {
 
                 repository.add(document);
             } else {
+                System.out.println("Update");
                 updateDocument(doc);
             }
             return STATUS_CODE_200;
@@ -91,12 +92,5 @@ public class DataService {
         status = stringBuilder.toString();
         return  status;
 
-    }
-    private boolean isExist(DocumentDTO doc) {
-        if (!repository.docIsExist(doc.getFileName())) {
-            String lastFourCharacters = doc.getFileName().substring(doc.getFileName().length() - 5);
-            return lastFourCharacters.equals(".docx");
-        }
-        return false;
     }
 }

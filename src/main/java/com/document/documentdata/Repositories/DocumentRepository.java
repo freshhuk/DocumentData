@@ -79,7 +79,7 @@ public class DocumentRepository {
             Document document = query.uniqueResult();
             session.getTransaction().commit();
 
-            return document == null;
+            return document != null;
         } catch (Exception ex) {
             System.out.println("Error method existsByUsername" + ex);
             return false;
