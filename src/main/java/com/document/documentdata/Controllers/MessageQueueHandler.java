@@ -7,7 +7,8 @@ import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 @Service
 public class MessageQueueHandler {
 
@@ -15,6 +16,7 @@ public class MessageQueueHandler {
     private final static String STATUS_CODE_200 = "200";
     /* Constant for queue */
     private final RabbitTemplate rabbitTemplate;
+    private static final Logger logger = LoggerFactory.getLogger(MessageQueueHandler.class);
 
 
 
@@ -34,7 +36,7 @@ public class MessageQueueHandler {
         try{
             String result = dataService.add(documentDTO);
             if(result.equals(STATUS_CODE_200)){
-                System.out.println("Success " + documentDTO.getFileName());
+                logger.info("Success " + documentDTO.getFileName());
                 sendMessage("StatusDataQueue", QueueStatus.DONE.toString());
                 sendMessage("MongoQueue", documentDTO);
 
