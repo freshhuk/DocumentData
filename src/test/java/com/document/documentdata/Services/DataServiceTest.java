@@ -61,4 +61,32 @@ public class DataServiceTest {
         Assertions.assertEquals(result, STATUS_CODE_200);
 
     }
+
+    @Test
+    void deleteDocumentTest(){
+
+        Document testDocument = new Document();{
+            testDocument.setId(1);
+            testDocument.setName("test.docx");
+            testDocument.setDocType(".docx");
+            testDocument.setIdUserModify(1);
+            testDocument.setIdUserCreate(1);
+            testDocument.setCreatedDate(LocalDate.now());
+        }
+
+        Mockito.when(repository.getByName("test")).thenReturn(testDocument);
+
+        var result = service.deleteDocument("BADtest");
+
+        Assertions.assertEquals(result, "DeleteDone");
+    }
+    @Test
+    void deleteDocumentIsNullTest(){
+
+        Mockito.when(repository.getByName("test")).thenReturn(null);
+
+        var result = service.deleteDocument("BADtest");
+
+        Assertions.assertEquals(result, "ErrorDelete");
+    }
 }
