@@ -5,10 +5,14 @@ import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
 import org.hibernate.query.Query;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Repository;
 
 @Repository
 public class DocumentRepository {
+
+    private static final Logger logger = LoggerFactory.getLogger(DocumentRepository.class);
 
     private final SessionFactory factory = new Configuration()
             .configure("hibernate.cfg.xml")
@@ -30,7 +34,7 @@ public class DocumentRepository {
             return document;
 
         } catch (Exception ex) {
-            System.out.println("Error with getByName in db: " + ex);
+            logger.error("Error with getByName in db: " + ex);
             return null;
         }
     }
@@ -51,7 +55,7 @@ public class DocumentRepository {
             session.persist(doc);
             session.getTransaction().commit();
         } catch (Exception ex) {
-            System.out.println("Error with add in db: " + ex);
+            logger.error("Error with add in db: " + ex);
         }
     }
 
@@ -67,7 +71,7 @@ public class DocumentRepository {
             session.merge(document); // we use marge for update own entity
             session.getTransaction().commit();
         }catch( Exception ex){
-            System.out.println("Error with update method: " + ex);
+            logger.error("Error with update method: " + ex);
         }
     }
 
@@ -81,7 +85,7 @@ public class DocumentRepository {
 
             return document != null;
         } catch (Exception ex) {
-            System.out.println("Error method existsByUsername" + ex);
+            logger.error("Error method existsByUsername" + ex);
             return false;
         }
     }

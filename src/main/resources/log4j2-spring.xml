@@ -1,25 +1,25 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Configuration status="WARN">
     <Appenders>
-        <!-- Консольный аппендер -->
+        <!-- Console appender -->
         <Console name="Console" target="SYSTEM_OUT">
             <PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss} [%t] %-5level %c{1} - %msg%n"/>
         </Console>
 
-        <!-- Файловый аппендер -->
+        <!-- File appender -->
         <File name="FileLogger" fileName="logs/app.log" append="true">
             <PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss} [%t] %-5level %c{1} - %msg%n"/>
         </File>
     </Appenders>
 
     <Loggers>
-        <!-- Логгер для пакета вашего приложения -->
+        <!-- Logger for my package -->
         <Logger name="com.document.documentdata" level="debug" additivity="false">
             <AppenderRef ref="Console"/>
             <AppenderRef ref="FileLogger"/>
         </Logger>
 
-        <!-- Корневой (общий) логгер для всего приложения -->
+        <!-- Root (common) logger for the entire application -->
         <Root level="info">
             <AppenderRef ref="Console"/>
             <AppenderRef ref="FileLogger"/>

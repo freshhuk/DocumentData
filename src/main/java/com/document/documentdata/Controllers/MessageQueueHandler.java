@@ -41,12 +41,12 @@ public class MessageQueueHandler {
                 sendMessage("MongoQueue", documentDTO);
 
             }else{
-                System.out.println("Ops.. " + documentDTO.getFileName());
+                logger.error("DataService result exits with error " + documentDTO.getFileName());
                 sendMessage("StatusDataQueue", QueueStatus.BAD.toString());
             }
 
         }catch (Exception ex){
-            System.out.println("Error from receiveDocument : " + ex);
+            logger.error("Error from receiveDocument " + ex);
             sendMessage("StatusDataQueue", QueueStatus.BAD.toString());
         }
 
@@ -59,12 +59,12 @@ public class MessageQueueHandler {
             sendMessage("StatusDataQueue", "AllDone");
         } else if (!statusL) {
             String result = dataService.deleteDocument(status);
-            System.out.println(result);
+            logger.info("Result of dataService deleteDocument " + result);
             sendMessage("StatusDataQueue", "AllError");
         }
         else{
             sendMessage("StatusDataQueue", "AllError");
-            System.out.println(status);
+            logger.info(status);
         }
     }
 
