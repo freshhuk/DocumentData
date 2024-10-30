@@ -87,6 +87,6 @@ public class DataServiceTest {
 
         var result = service.deleteDocument("BADtest");
 
-        Assertions.assertEquals(result, "ErrorDelete");
+        Assertions.assertEquals(result, "ErrorDelete9");
     }
 }

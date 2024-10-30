@@ -56,6 +56,7 @@ public class MessageQueueHandler {
         boolean statusL = status.length() == 3;
 
         if(status.equals(QueueStatus.DONE.toString())){
+            logger.info("Result AllDone ");
             sendMessage("StatusDataQueue", "AllDone");
         } else if (!statusL) {
             String result = dataService.deleteDocument(status);
