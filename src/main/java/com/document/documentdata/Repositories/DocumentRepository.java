@@ -75,6 +75,20 @@ public class DocumentRepository {
         }
     }
 
+    public void deleteAll(){
+        try(Session session = factory.openSession()){
+
+            session.beginTransaction();
+
+            session.createQuery("delete from Document", Document.class).executeUpdate();
+
+            session.getTransaction().commit();
+        } catch (Exception ex){
+            logger.error("Error in deleteAll: " + ex);
+        }
+    }
+
+
     public boolean docIsExist(String docName){
         try (Session session = factory.openSession()) {
             session.beginTransaction();

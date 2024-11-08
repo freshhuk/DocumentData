@@ -51,20 +51,40 @@ public class MessageQueueHandler {
         }
 
     }
+
+    @RabbitListener(queues = "StatusDataQueue")
+    public void receiveDataStatus(String status){
+        try{
+            if(status.equals("Delete")){
+                String result = dataService.deleteAllDocuments();
+                if(result.equals("DeleteDone")){
+                    sendMessage("StatusDataQueue", "DeleteMongo");
+                    logger.info("Send status delete in mongo status queue");
+                } else{
+                    logger.error("Error with deleting entity ");
+                }
+            }
+        } catch (Exception ex){
+            logger.error("Error with receiveDataStatus");
+        }
+    }
+
+
+
     @RabbitListener(queues = "StatusMongoQueue")
     public void receiveMongoStatus(String status){
         boolean statusL = status.length() == 3;
 
         if(status.equals(QueueStatus.DONE.toString())){
             logger.info("Result AllDone ");
-            sendMessage("StatusDataQueue", "AllDone");
+            sendMessage("FinalStatusQueue", "AllDone");
         } else if (!statusL) {
             String result = dataService.deleteDocument(status);
             logger.info("Result of dataService deleteDocument " + result);
-            sendMessage("StatusDataQueue", "AllError");
+            sendMessage("FinalStatusQueue", "AllError");
         }
         else{
-            sendMessage("StatusDataQueue", "AllError");
+            sendMessage("FinalStatusQueue", "AllError");
             logger.info(status);
         }
     }

@@ -72,15 +72,16 @@ public class DataService {
 
     /**
      * Method for deleting document from postgres database
-     * @param status - document status
+     * @param status document status
      * @return - method status
      */
     public String deleteDocument(String status){
         try{
             String fileName = parseStatus(status);
             var model = repository.getByName(fileName);
-            if(model!= null){
+            if(model != null){
                 repository.deleteById(model.getId());
+                logger.info("Document was deleted");
                 return "DeleteDone";
             } else {
                 logger.error("deleteDocument: Model is null");
@@ -89,6 +90,21 @@ public class DataService {
         } catch (Exception ex){
             logger.error("Error with deleteDocument method: " + ex);
             return "ErrorDelete";
+        }
+    }
+
+    /**
+     * Method deletes all entity from postgres database
+     * @return method - status
+     */
+    public String deleteAllDocuments(){
+        try{
+            repository.deleteAll();
+            logger.info("Documents were deleted");
+            return "DeleteDone";
+        } catch (Exception ex){
+            logger.error("Error with deleteAllDocument method: " + ex);
+            return "DeleteError";
         }
     }
 
