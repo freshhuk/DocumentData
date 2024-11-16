@@ -34,11 +34,14 @@ public class MessageQueueHandler {
      * @param documentDTO - document model
      */
     @RabbitListener(queues = "dataQueue")
-    public void receiveDocument(MessageWrapper documentDTO) {
+    public void receiveDocument(MessageWrapper<DocumentDTO> documentDTO) {
         try {
+            System.out.println(documentDTO.getAction() + " " + documentDTO.getPayload().toString());
 
-            DocumentDTO document = (DocumentDTO) documentDTO.getPayload();
-            MessageWrapper message = new MessageWrapper(MessageAction.UPLOAD.toString(), MessageAction.UPLOAD.toString());
+
+            DocumentDTO document = documentDTO.getPayload();
+            MessageWrapper<String> message = new MessageWrapper<>(MessageAction.UPLOAD.toString(), MessageAction.UPLOAD.toString());
+
 
             String result = dataService.add(document);
             if (result.equals(STATUS_CODE_200)) {
@@ -48,20 +51,20 @@ public class MessageQueueHandler {
 
             } else {
                 logger.error("DataService result exits with error " + documentDTO);
-                MessageWrapper messageError = new MessageWrapper(MessageAction.UPLOAD.toString(), QueueStatus.BAD.toString());
+                MessageWrapper<String> messageError = new MessageWrapper<>(MessageAction.UPLOAD.toString(), QueueStatus.BAD.toString());
                 sendMessage("StatusDataQueue", messageError);
             }
 
         } catch (Exception ex) {
             logger.error("Error from receiveDocument " + ex);
-            MessageWrapper messageError = new MessageWrapper(MessageAction.UPLOAD.toString(), QueueStatus.BAD.toString());
+            MessageWrapper<String> messageError = new MessageWrapper<>(MessageAction.UPLOAD.toString(), QueueStatus.BAD.toString());
             sendMessage("StatusDataQueue", messageError);
         }
 
     }
 
 
-    //Todo - удаление всех доков
+    //Todo - удаление всех доков + всю логику спрятать в сервисы и провести декомпозицию, что б слушатели были мелкими
 
     /*
     @RabbitListener(queues = "StatusDataQueue")
@@ -87,29 +90,32 @@ public class MessageQueueHandler {
 */
 
 
-    @RabbitListener(queues = "StatusMongoQueue") //todo добавить удаление сущности
-    public void receiveMongoStatus(MessageWrapper message) {
+    @RabbitListener(queues = "StatusMongoQueue")
+    public void receiveMongoStatus(MessageWrapper<MessageWrapper<DocumentDTO>> message) {
 
         if (message.getAction().equals(MessageAction.UPLOAD.toString())) {
 
 
-            //&& message.getPayload() instanceof String может  этим придумать как то проверку на тип данных
+            //Message with model and status
+            MessageWrapper<DocumentDTO> receivedMessage = message.getPayload();
 
-            String receivedStatus = (String) message.getPayload();
-            MessageWrapper sentMessage = new MessageWrapper();
+            MessageWrapper<String> sentMessage = new MessageWrapper<>();
 
-            if (receivedStatus.equals(QueueStatus.DONE.toString())) {
+            String modelStatus = receivedMessage.getAction();
+            DocumentDTO receivedModel = receivedMessage.getPayload();
+
+            if (modelStatus.equals(QueueStatus.DONE.toString())) {
 
                 sentMessage.setAction(MessageAction.UPLOAD.toString());
                 sentMessage.setPayload(QueueStatus.ALL_DONE.toString());
 
-                logger.info("Result AllDone ");
+                logger.info("Result AllDone. Received model: " + receivedModel.toString());
 
                 sendMessage("FinalStatusQueue", sentMessage);
 
-            } else if (receivedStatus.equals(QueueStatus.BAD.toString())){
+            } else if (modelStatus.equals(QueueStatus.BAD.toString()) && receivedModel != null){
 
-                String result = dataService.deleteDocument(receivedStatus);
+                String result = dataService.deleteDocument(receivedModel.getFileName());
                 logger.info("Result of dataService deleteDocument " + result);
 
                 sentMessage.setAction(MessageAction.UPLOAD.toString());
@@ -117,7 +123,7 @@ public class MessageQueueHandler {
 
                 sendMessage("FinalStatusQueue", sentMessage);
 
-                logger.info(receivedStatus);
+                logger.info("Document " + receivedModel.getFileName() + " was deleted");
             }
         }
     }
@@ -127,7 +133,7 @@ public class MessageQueueHandler {
      * @param nameQueue - receiving queue
      * @param object - wrapper message
      */
-    private void sendMessage(String nameQueue, MessageWrapper object) {
+    private void sendMessage(String nameQueue, MessageWrapper<?> object) {
         rabbitTemplate.convertAndSend(nameQueue, object);
     }
 

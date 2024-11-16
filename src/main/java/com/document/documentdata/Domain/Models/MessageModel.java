@@ -2,17 +2,21 @@ package com.document.documentdata.Domain.Models;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+/**
+ * This model for request or response with document model
+ */
 @Data
-@AllArgsConstructor
 @NoArgsConstructor
-@Builder
-public class MessageWrapper<T> {
+@AllArgsConstructor
+public class MessageModel {
+
     @JsonProperty("action")
     private String action;
-    @JsonProperty("payload")
-    private T payload;
+    @JsonProperty("status")
+    private String status;
+    @JsonProperty("documentDTO")
+    private DocumentDTO documentDTO;
 }
