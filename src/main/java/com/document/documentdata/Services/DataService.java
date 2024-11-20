@@ -1,6 +1,7 @@
 package com.document.documentdata.Services;
 
 import com.document.documentdata.Domain.Entities.Document;
+import com.document.documentdata.Domain.Enums.QueueStatus;
 import com.document.documentdata.Domain.Models.DocumentDTO;
 import com.document.documentdata.Repositories.DocumentRepository;
 import org.slf4j.Logger;
@@ -79,16 +80,17 @@ public class DataService {
         try{
             var model = repository.getByName(fileName);
             if(model != null){
-                repository.deleteById(model.getId());
+                repository.deleteById(model.getId());  добавить новую очередь передача статусса с апи в постгрес
+                        что  б не юхать очередь постгреса потомучто нарушается логика
                 logger.info("Document was deleted");
-                return "DeleteDone";
+                return QueueStatus.DONE.toString();
             } else {
                 logger.error("deleteDocument: Model is null");
-                return "ErrorDelete";
+                return QueueStatus.BAD.toString();
             }
         } catch (Exception ex){
             logger.error("Error with deleteDocument method: " + ex);
-            return "ErrorDelete";
+            return QueueStatus.BAD.toString();
         }
     }
 
@@ -100,10 +102,12 @@ public class DataService {
         try{
             repository.deleteAll();
             logger.info("Documents were deleted");
-            return "DeleteDone";
+            return QueueStatus.DONE.toString();
+
         } catch (Exception ex){
+
             logger.error("Error with deleteAllDocument method: " + ex);
-            return "DeleteError";
+            return QueueStatus.BAD.toString();
         }
     }
 }

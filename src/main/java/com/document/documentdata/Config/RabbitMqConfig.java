@@ -1,7 +1,6 @@
 package com.document.documentdata.Config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.springframework.amqp.core.Queue;
 import org.springframework.amqp.rabbit.connection.CachingConnectionFactory;
 import org.springframework.amqp.rabbit.connection.ConnectionFactory;
 import org.springframework.amqp.rabbit.core.RabbitAdmin;
@@ -19,11 +18,6 @@ public class RabbitMqConfig {
 
     @Value("${spring.rabbitmq.password}")
     private String queuePassword;
-
-    @Bean
-    public Queue queue(){
-        return new Queue("MongoQueue", false);
-    }
 
     @Bean
     public CachingConnectionFactory connectionFactory(){

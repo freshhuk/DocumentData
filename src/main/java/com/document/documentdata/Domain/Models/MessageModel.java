@@ -13,10 +13,8 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class MessageModel {
 
-    @JsonProperty("action")
-    private String action;
     @JsonProperty("status")
     private String status;
-    @JsonProperty("documentDTO")
-    private DocumentDTO documentDTO;
+    @JsonProperty("documentModel")
+    private DocumentDTO documentModel;
 }

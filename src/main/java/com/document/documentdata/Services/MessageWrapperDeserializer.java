@@ -1,6 +1,7 @@
 package com.document.documentdata.Services;
 
 import com.document.documentdata.Domain.Models.DocumentDTO;
+import com.document.documentdata.Domain.Models.MessageModel;
 import com.document.documentdata.Domain.Models.MessageWrapper;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.DeserializationContext;
@@ -22,15 +23,18 @@ public class MessageWrapperDeserializer extends JsonDeserializer<MessageWrapper<
         if (node.has("payload")) {
             JsonNode payloadNode = node.get("payload");
 
-            // Логика для обработки строки
+            // Logic for strings
             if (payloadNode.isTextual()) {
-                payload = payloadNode.asText();  // Если это строка
+                payload = payloadNode.asText();  // String
             }
-            // Логика для десериализации объекта DocumentDTO
-            else if (payloadNode.has("fileName") && payloadNode.has("fileType")) {
-                payload = jp.getCodec().treeToValue(payloadNode, DocumentDTO.class);  // Если это объект DocumentDTO
-            } else {
-                payload = jp.getCodec().treeToValue(payloadNode, Object.class); // Дефолтная обработка
+            //Log for another classes
+            else if (payloadNode.has("fileName") && payloadNode.has("fileType")) {//  DocumentDTO
+                payload = jp.getCodec().treeToValue(payloadNode, DocumentDTO.class);
+            }
+            else if (payloadNode.has("status") && payloadNode.has("documentModel")) {
+                payload = jp.getCodec().treeToValue(payloadNode, MessageModel.class);  // MessageModel
+            }else {
+                payload = jp.getCodec().treeToValue(payloadNode, Object.class); //Object
             }
         } else {
             payload = null;
