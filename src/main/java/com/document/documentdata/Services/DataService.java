@@ -80,8 +80,7 @@ public class DataService {
         try{
             var model = repository.getByName(fileName);
             if(model != null){
-                repository.deleteById(model.getId());  добавить новую очередь передача статусса с апи в постгрес
-                        что  б не юхать очередь постгреса потомучто нарушается логика
+                repository.deleteById(model.getId());
                 logger.info("Document was deleted");
                 return QueueStatus.DONE.toString();
             } else {

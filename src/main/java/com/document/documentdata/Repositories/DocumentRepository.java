@@ -80,7 +80,7 @@ public class DocumentRepository {
 
             session.beginTransaction();
 
-            session.createQuery("delete from Document", Document.class).executeUpdate();
+            session.createQuery("delete from Document").executeUpdate();
 
             session.getTransaction().commit();
         } catch (Exception ex){

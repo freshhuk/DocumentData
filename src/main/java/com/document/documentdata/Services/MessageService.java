@@ -112,6 +112,29 @@ public class MessageService {
             logger.error("Error with delete entity " + ex);
         }
     }
+    /**
+     * Method for processing message from mongo queue: action - delete
+     * @param message message from mongo queue
+     */
+    public void sendFinalStatusDelete(MessageWrapper<String> message){
+        try{
+            MessageWrapper<String> finalMessage;
+            if(message.getPayload().equals(QueueStatus.DONE.toString())){
+                finalMessage = new MessageWrapper<>(MessageAction.DELETE.toString(), QueueStatus.ALL_DONE.toString());
+                logger.info("Delete was successful");
+                sendMessage("FinalStatusQueue", finalMessage);
+            } else{
+                finalMessage = new MessageWrapper<>(MessageAction.DELETE.toString(), QueueStatus.ALL_ERROR.toString());
+                logger.warn("Delete with some problems");
+                sendMessage("FinalStatusQueue", finalMessage);
+            }
+        } catch (Exception ex){
+            logger.error("Error with delete " + ex);
+            MessageWrapper<String>  finalMessage = new MessageWrapper<>(MessageAction.DELETE.toString(), QueueStatus.ALL_ERROR.toString());
+            sendMessage("FinalStatusQueue", finalMessage);
+        }
+
+    }
 
     /**
      * Method sends message on rabbit queue

@@ -35,7 +35,7 @@ public class MessageQueueHandler {
      * Method deletes all entities and send status on mongo queue
      * @param message message
      */
-    @RabbitListener(queues = "StatusDataQueue")
+    @RabbitListener(queues = "queueAPIStatus")
     public void receiveDataStatus(MessageWrapper<String> message){
 
         if(message.getAction().equals(MessageAction.DELETE.toString()) && message.getPayload().equals(MessageAction.DELETE.toString())){
@@ -48,9 +48,15 @@ public class MessageQueueHandler {
      * @param message message
      */
     @RabbitListener(queues = "StatusMongoQueue")
-    public void receiveMongoStatus(MessageWrapper<MessageModel> message) {
-        if (message.getAction().equals(MessageAction.UPLOAD.toString())) {
-            messageService.sendFinalStatusUpload(message);
+    public void receiveMongoStatus(MessageWrapper<?> message) {
+        if (message.getAction().equals(MessageAction.UPLOAD.toString()) && message.getPayload() instanceof MessageModel) {
+            messageService.sendFinalStatusUpload((MessageWrapper<MessageModel>)message);
+            System.out.println("Well done");
+        }
+        else if (message.getAction().equals(MessageAction.DELETE.toString()) && message.getPayload() instanceof String) {
+            messageService.sendFinalStatusDelete((MessageWrapper<String>)message);
+
         }
     }
+
 }
