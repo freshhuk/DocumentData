@@ -79,7 +79,13 @@
             <version>6.3.1.Final</version>
         </dependency>
 
-
+        <!--Docker-->
+        <!--<dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-docker-compose</artifactId>
+            <scope>runtime</scope>
+            <optional>false</optional>
+        </dependency>-->
 
         <dependency>
             <groupId>org.projectlombok</groupId>

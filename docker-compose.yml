@@ -1,0 +1,13 @@
+version: '3'
+
+services:
+
+  backendfindme:
+    build: .
+    ports:
+      - "8080:8000"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://localhost:5432/my_db
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: freshhukfresh
+      restart: no

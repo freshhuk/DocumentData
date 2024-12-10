@@ -1,92 +1,135 @@
 package com.document.documentdata.Services;
 
 import com.document.documentdata.Domain.Entities.Document;
+import com.document.documentdata.Domain.Enums.QueueStatus;
 import com.document.documentdata.Domain.Models.DocumentDTO;
 import com.document.documentdata.Repositories.DocumentRepository;
-import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
-import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.MockitoAnnotations;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.*;
 
-import java.time.LocalDate;
+class DataServiceTest {
 
-@ExtendWith(MockitoExtension.class)
-public class DataServiceTest {
-
-    private final static String STATUS_CODE_200 = "200";
-
-    @InjectMocks
-    private DataService service;
     @Mock
     private DocumentRepository repository;
 
-    @Test
-    void addTestValid(){
+    @InjectMocks
+    private DataService dataService;
 
-        DocumentDTO testModel = new DocumentDTO();
-        testModel.setFileName("Test.docx");
-        testModel.setFileType(".docx");
-
-        Mockito.when(repository.docIsExist(testModel.getFileName())).thenReturn(false);
-
-        var result = service.add(testModel);
-
-        Assertions.assertEquals(result, STATUS_CODE_200);
-
-    }
-    @Test
-    void addTestUpdate(){
-
-        Document testDocument = new Document();{
-            testDocument.setId(1);
-            testDocument.setName("Test.docx");
-            testDocument.setDocType(".docx");
-            testDocument.setIdUserModify(1);
-            testDocument.setIdUserCreate(1);
-            testDocument.setCreatedDate(LocalDate.now());
-        }
-
-        DocumentDTO testModel = new DocumentDTO();
-        testModel.setFileName("Test.docx");
-        testModel.setFileType(".docx");
-
-        Mockito.when(repository.docIsExist(testModel.getFileName())).thenReturn(true);
-        Mockito.when(repository.getByName(testModel.getFileName())).thenReturn(testDocument);
-
-        var result = service.add(testModel);
-
-        Assertions.assertEquals(result, STATUS_CODE_200);
-
+    @BeforeEach
+    void setUp() {
+        MockitoAnnotations.openMocks(this);
     }
 
     @Test
-    void deleteDocumentTest(){
+    void testAdd_NewDocument_Success() {
+        // Arrange
+        DocumentDTO documentDTO = new DocumentDTO("TestFile", "txt");
+        when(repository.docIsExist(documentDTO.getFileName())).thenReturn(false);
 
-        Document testDocument = new Document();{
-            testDocument.setId(1);
-            testDocument.setName("test.docx");
-            testDocument.setDocType(".docx");
-            testDocument.setIdUserModify(1);
-            testDocument.setIdUserCreate(1);
-            testDocument.setCreatedDate(LocalDate.now());
-        }
+        // Act
+        String result = dataService.add(documentDTO);
 
-        Mockito.when(repository.getByName("test")).thenReturn(testDocument);
-
-        var result = service.deleteDocument("BADtest");
-
-        Assertions.assertEquals(result, "DeleteDone");
+        // Assert
+        assertEquals("200", result);
+        verify(repository, times(1)).add(any(Document.class));
+        verify(repository, never()).update(any(Document.class));
     }
+
     @Test
-    void deleteDocumentIsNullTest(){
+    void testAdd_ExistingDocument_Update() {
+        // Arrange
+        DocumentDTO documentDTO = new DocumentDTO("TestFile", "txt");
+        when(repository.docIsExist(documentDTO.getFileName())).thenReturn(true);
+        when(repository.getByName(documentDTO.getFileName())).thenReturn(new Document());
 
-        Mockito.when(repository.getByName("test")).thenReturn(null);
+        // Act
+        String result = dataService.add(documentDTO);
 
-        var result = service.deleteDocument("BADtest");
+        // Assert
+        assertEquals("200", result);
+        verify(repository, never()).add(any(Document.class));
+        verify(repository, times(1)).update(any(Document.class));
+    }
 
-        Assertions.assertEquals(result, "ErrorDelete9");
+    @Test
+    void testAdd_ExceptionHandling() {
+        // Arrange
+        DocumentDTO documentDTO = new DocumentDTO("TestFile", "txt");
+        when(repository.docIsExist(any())).thenThrow(new RuntimeException("Database error"));
+
+        // Act
+        String result = dataService.add(documentDTO);
+
+        // Assert
+        assertEquals("ERROR", result);
+    }
+
+    @Test
+    void testDeleteDocument_Success() {
+        // Arrange
+        Document document = new Document();
+        document.setId(1);
+        document.setName("TestFile");
+        when(repository.getByName("TestFile")).thenReturn(document);
+
+        // Act
+        String result = dataService.deleteDocument("TestFile");
+
+        // Assert
+        assertEquals(QueueStatus.DONE.toString(), result);
+        verify(repository, times(1)).deleteById(document.getId());
+    }
+
+    @Test
+    void testDeleteDocument_NotFound() {
+        // Arrange
+        when(repository.getByName("NonExistentFile")).thenReturn(null);
+
+        // Act
+        String result = dataService.deleteDocument("NonExistentFile");
+
+        // Assert
+        assertEquals(QueueStatus.BAD.toString(), result);
+        verify(repository, never()).deleteById(anyInt());
+    }
+
+    @Test
+    void testDeleteDocument_ExceptionHandling() {
+        // Arrange
+        when(repository.getByName(any())).thenThrow(new RuntimeException("Database error"));
+
+        // Act
+        String result = dataService.deleteDocument("TestFile");
+
+        // Assert
+        assertEquals(QueueStatus.BAD.toString(), result);
+    }
+
+    @Test
+    void testDeleteAllDocuments_Success() {
+        // Act
+        String result = dataService.deleteAllDocuments();
+
+        // Assert
+        assertEquals(QueueStatus.DONE.toString(), result);
+        verify(repository, times(1)).deleteAll();
+    }
+
+    @Test
+    void testDeleteAllDocuments_ExceptionHandling() {
+        // Arrange
+        doThrow(new RuntimeException("Database error")).when(repository).deleteAll();
+
+        // Act
+        String result = dataService.deleteAllDocuments();
+
+        // Assert
+        assertEquals(QueueStatus.BAD.toString(), result);
     }
 }
